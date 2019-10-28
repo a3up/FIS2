@@ -1,0 +1,49 @@
+load("constants.mac")$
+load("basic.mac")$
+
+/* Electric Field */
+tribo_series() := (
+	print("Glass"),
+	print("Human Hair"),
+	print("Wool"),
+	print("Lead"),
+	print("Silk"),
+	print("Aluminum"),
+	print("Paper"),
+	print("Wood"),
+	print("Copper"),
+	print("Silver"),
+	print("Rubber"),
+	print("Acetate"),
+	print("Styrofoam"),
+	print("Vinyl(PVC)")
+)$
+coulomb(F, q1, q2, d) := (
+	if listp(d) or listp(F)
+	then {
+		_F: _k_ * q1 * q2 / modulus(d)^2,
+		[_cos, _sin]: [d[1], d[2]]/modulus(d),
+		_F: [-_F*_cos, -_F*_sin],
+		for i : 1 thru length(_F) do {
+			if not numberp(F[i]) then
+				F[i]: _F[i]
+		},
+		_res: lsolve(F, _F)
+	} else {
+		_F: _k_ * q1 * q2 / d^2,
+		_res: solve(F = -_F)
+	},
+	_res: rhs(_res[1])
+)$
+electric_field(E, [args]) := (
+	if length(args) = 1 then {
+		_E: _k_ * args[1] / r^2,
+		_res: _E
+	},
+	if length(args) = 2 then {
+		_E: args[1]/args[2],
+		_res: rhs(solve(_E = E)[1])
+	},
+	_res
+)$
+

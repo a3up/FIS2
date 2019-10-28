@@ -1,0 +1,61 @@
+FORMULÁRIO (Ainda incompleto)
+0 - GERAL
+
+declive_recta: m=(y1-y0)/(x1-x0);
+subst([y1=3.0, y0=7.0, x1=6.0, x0=0.0], declive_recta);
+
+def_recta: y-y0=m*(x-x0);
+subst([y0=7.0, m=-(2/3), x0=0.0], def_recta);
+solve(%o??,y);
+
+1 - Carga e força elétrica
+
+carga_elementar: e=1.60*10^-19;
+
+// Lei de Coulomb
+Forca: F=(k*(abs(q1)*abs(q2)))/(K*r^2);
+subst([k=9*10^9, q1=-6.0*10^-6, q2=-6.0*10^-6, K=1.0, r=4.0], Forca);
+Assume-se K=1 para o vácuo e no ar também é próximo de 1, logo é desprezível
+
+// Constante de Coulomb
+constante_coulomb: k=9.0*10^9;
+
+Energia_pontual: E=(k*abs(q1))/(K*r^2);
+subst([k=9*10^9, q1=-6.0*10^-6, K=1.0, r=4.0], Energia_pontual);
+
+Energia: E=F/q0;
+subst([F=9*10^9, q0=6.0*10^-6], Energia);
+
+campo_eletrico: E=F/q0;
+subst([F=9*10^9, q0=6.0*10^-6], campo_eletrico);
+
+campo_eletrico_carga_pontual: E=k*abs(Q)/r^2;
+subst([k=9*10^9, Q=6.0*10^-6, r=2.0], campo_eletrico_carga_pontual);
+
+
+2 - Potencial, corrente e força eletromotriz
+
+corrente_media:I=dQ/dt;
+subst([dQ=50, dt=10], corrente_media);
+
+fem:E=dUe/e;
+
+geral: 1/2*m*v^2+q*V=1/2*m*v0^2+q*V0;
+subst([m=9.109*10^-31, V=0, v0=0, q=1.60*10^-19, V0=4000], geral);
+solve(%o??,v);
+ev(%o??,numer);
+
+3 - Resistência elétrica
+
+resistencia_temperatura: R=R20*(1+alfa20*(T-20));
+subst([R=8.0*10^3, R20=6.5*10^3, T=60],resistencia_temperatura);
+
+4 - Capacidade elétrica
+
+capacidade: C=Q/VSup;
+subst([Q=8.0*10^3, VSup=6.5*10^3],capacidade);
+
+condensador_plano: CPlano=K*A/4*%pi*k+d;
+subst([K=8.0*10^3, A=6.5*10^3, k=6.5*10^3, d=6.5*10^3],condensador_plano);
+
+

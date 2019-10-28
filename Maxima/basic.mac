@@ -1,0 +1,32 @@
+vectorize(v) := (
+	if listp(v[1]) then {
+		v: v[1]
+	},
+	v
+)$
+lsolve(l1, l2) := (
+	_eqs: l2,
+	for i : 1 thru length(l2) do {
+		_eqs[i]: solve(l1[i] = l2[i])[1]
+	},
+	solve(_eqs)[1]
+)$
+modulus([v]) := (
+	v: vectorize(v),
+	_m: 0,
+	for i:1 thru length(v) do
+		_m: _m + v[i]^2,
+	_m: sqrt(_m)
+)$
+harmonic_mean([v]) := (
+	v: vectorize(v),
+	_res: 0,
+	for i : 1 thru length(v) do
+		_res: _res + (v[i])^(-1),
+	_res: _res/length(v),
+	_res: _res^(-1)
+)$
+product_over_sum([v]) := (
+	v: vectorize(v),
+	_res: harmonic_mean(v)/length(v)
+)$

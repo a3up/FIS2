@@ -1,0 +1,51 @@
+/* Configurations */
+ratprint: false$
+fpprintprec: 4$
+
+/* Natural Constants */
+_g_: 9.8$
+_k_: 9.0e9$
+_e_: 1.602e-19$
+_electron_mass_: 9.109e-31$
+
+/* SI Prefixes */
+Y(value) := (
+	_v: 10^24* value )$
+Z(value) := (
+	_v: 10^21* value )$
+E(value) := (
+	_v: 10^18* value )$
+P(value) := (
+	_v: 10^15* value )$
+T(value) := (
+	_v: 10^12* value )$
+G(value) := (
+	_v: 10^9 * value )$
+M(value) := (
+	_v: 10^6 * value )$
+k(value) := (
+	_v: 10^3 * value )$
+h(value) := (
+	_v: 10^2 * value )$
+da(value) := (
+	_v: 10 * value )$
+d(value) := (
+	_v: 10^(-1) * value )$
+c(value) := (
+	_v: 10^(-2) * value )$
+m(value) := (
+	_v: 10^(-3) * value )$
+micro(value) := (
+	_v: 10^(-6) * value )$
+n(value) := (
+	_v: 10^(-9) * value )$
+p(value) := (
+	_v: 10^(-12)* value )$
+f(value) := (
+	_v: 10^(-15)* value )$
+a(value) := (
+	_v: 10^(-18)* value )$
+z(value) := (
+	_v: 10^(-21)* value )$
+y(value) := (
+	_v: 10^(-24)* value )$
