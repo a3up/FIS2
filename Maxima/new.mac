@@ -1,0 +1,96 @@
+load("constants.mac")$
+load("basic.mac")$
+
+force() := (
+	print("1 : Cargas e Distância"),
+	print("2 : Campo e Carga"),
+	print("3 : Cargas e Posições"),
+	__option: string(read("A partir de quais informações? ")),
+	__F: "",
+	if __option = "1" then {
+		__q1: read("Carga 1   (C) : "),
+		__q2: read("Carga 2   (C) : "),
+		__d : read("Distancia (m) : "),
+		if listp(__d) then {
+			__F: _k_ * __q1 * __q2 / modulus(__d)^2,
+			[__cos, __sin]: [__d[1], __d[2]]/modulus(__d),
+			__F: [-__F * __cos, -__F * __sin]
+		} else {
+			__F: -_k_ * __q1 * __q2 / __d ^ 2
+		}
+	} else if __option = "2" then {
+		__q    : read("Carga   (C) : "),
+		__field: read("Campo (N/C) : "),
+		__F    : __field * __q
+	} else if __option = "3" then {
+		__q: read("[Cargas]    (C) : "),
+		__p: copylist(__q),
+		__dim: length(__q),
+		for i : 1 thru __dim do {
+			__p[i]: read(concat("Posição ", i, "   (m) : "))
+		},
+		__F: ident(__dim),
+		for i : 1 thru __dim do {
+			for j : 1 thru __dim do {
+				if i = j then
+					__F[i][j]: [0, 0]
+				else{
+					__d: __p[j] - __p[i],
+					__F[i][j]: _k_ * __q[i] * __q[j] / modulus(__d)^2,
+					[__cos, __sin]: [__d[1], __d[2]]/modulus(__d),
+					__F[i][j]: [-__F[i][j] * __cos, -__F[i][j] * __sin],
+					if i < j then
+						print("Força entre ", i, " e ", j, "   : ", abs(__F[i][j]), " N")
+				}
+			}
+		},
+		for i : 1 thru __dim do {
+			print("Força resultante em ", i, " : ", -apply("+", args(col(__F, i)))[1], " N")
+		}
+	},
+	__ret: __F
+)$
+
+charge() := (
+	print("1 : Força e Distância entre Cargas Iguais"),
+	print("2 : Força, Distância e outra Carga"),
+	__option: string(read("A partir de quais informações? ")),
+	__q: "",
+	if __option = "1" then {
+		__F: read("Força     (N) : "),
+		__d: read("Distância (m) : "),
+		__q: sqrt(abs(__F * __d ^ 2 / _k_)),
+		print("Q : ", __q, " C")
+	} else if __option = "2" then {
+		__F: read("Força     (N) : "),
+		__q1: read("Carga     (C) : "),
+		__d: read("Distância (m) : "),
+		__q: -abs(__F * __d ^ 2 / _k_ / __q1),
+		print("Q : ", __q, " C")
+	},
+	__ret: __q
+)$
+
+field() := (
+	print("1 : Carga e Distância"),
+	__option: string(read("A partir de quais informações? ")),
+	__E: "",
+	if __option = "1" then {
+		__q: read("Carga     (C) : "),
+		__d: read("Distância (m) : "),
+		__E: _k_ * abs(__q) / __d^2,
+		print("E : ", __E, " N/C")
+	},
+	__ret: __E
+)$
+
+init() := (
+	__option: string(read("O que você quer calcular?")),
+	if __option = "force" or __option = "força" or __option = "forca" or __option = "f"
+		then force(),
+	if __option = "field" or __option = "campo" or __option = "e"
+		then field(),
+	if __option = "charge" or __option = "carga" or __option = "q"
+		then charge()
+	else print("Opção Desconhecida")
+)$

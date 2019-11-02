@@ -1,0 +1,354 @@
+resistencia_novo_fio_mesmo_material() := (
+	_c: read("comprimento do fio em cm"),
+	_raio: read("raio do fio em cm"),
+	_resist: read("resistencia em ohm"),
+	_newraio: read("raio do novo fio em cm"),
+	_newc: read("comprimento do novo fio em cm"),
+	_fim: 0.001*((_resist*(_raio*_raio*3.14))*_newc)/(_newraio*_newraio*3.14)
+)$
+
+resistencia_duma_lampada() := (
+	_tensao: read("tensao em V"),
+	_potencia: read("potencia em W"),
+	_fim: float(_tensao/(_potencia/_tensao))
+)$
+
+resistencia_em_outra_temperatura() := (
+	_resistencia: read("resistencia em Ohm"),
+	_coef: read("coeficiente de temperatura"),
+	_tmpini: read("temperatura inicial"),
+	_tmpfinal: read("temperatura final"),
+	_fim: float(_resistencia*(1 + _coef*(_tmpfinal - _tmpini)))
+)$
+
+resistencia_intensidade_corrente_interruptor():=(
+    print(" __________/ _____________________R2________"),
+    print("|                     |                     |"),
+    print("|                     |                     |"),
+    print("V                     R1                    V"),
+    print("|                     |                     |"),
+    print(" _____________________|____________V________|"),
+    r1: read ("Resistencia 1 (kΩ):"),
+    r2: read ("Resistencia 2 (kΩ):"),
+	v: read ("Pilhas (V):"),
+	
+	R: matrix([r1,-r1],[-r1,r1+r2]),
+	
+	E: matrix([v],[-2*v]),
+	
+	matrix([I1],[I2])=invert(R).E,
+	
+	print(" A solução é um dos valores abaixo, quase de certeza o segundo "),
+	print(abs(float((invert(R).E)[1,1]))),
+	print(abs(float((invert(R).E)[2,1])))
+);
+
+dados_esfera_eletrizada() := (
+numel: read ("numero de electroes:"),
+t: read ("tempo:"),
+V: read ("fem"),
+Q: (numel*1.602*10^-19),
+I: Q/t,
+print("carga: ", Q, "---- corrente: ", I, "---- energia fornecida ", Q*V," ------ potencia media durante(em W) ",t," segundos ", Q*V/t)
+);
+
+dispositivo_ligado_fonte_tensao_continua_carga_total():=(tensao:read("tensao em V"),potencia:read("potencia em W"),tempo:read("tempo em s"),float(fim=(tempo*potencia)/tensao));
+
+coeficiente_temperatura():=(rini:read("resistencia inicial em Ohm"),
+          rfinal:read("resistencia aumentada em Ohm"),
+         tmpini:read("temperatura inicial"),
+         tmpfinal:read("temperatura final"),
+                  float(fim = (rfinal-rini)/(rini*(tmpfinal-tmpini))));
+
+fonte_tensao_ligada_condensador():=(
+res1: read("(ler resistencias esquerda para direita, sendo que a 2º e 3º res são ||) resistência 1 (1ª fila) (kΩ) ?"),
+res2: read("res da resistência 2 (2ª fila) (kΩ) ?"),
+res3: read("res da resistência 3 (3ª fila) (kΩ) ?"),
+fem: read("fem da fonte (V) ?"),
+cond: read("condensador (µF) ?"),
+rp:(res2*res3)/(res2+res3),
+rt:res1+rp,
+I=fem/rt);
+
+/*
+	Lida com problemas das malhas de forma mutável.
+	No máximo podem haver nmalhas incógnitas, deixar com um nome genérico o que se quiser descobrir.
+	
+-ss
+*/
+
+malhas() := (
+	block([len, sr, front, R, I, V, eq, sol],
+		print("Batch para as malhas, aceita nmalhas incognitas, basta deixar como variaveis o input."),
+		len: read("numero de malhas? "),
+		/* soma das resist */
+		sr: makelist(read("soma das resistencias na malha", i, ":"),i, 1, len),
+		/* fronteiras */
+		for i: 1 thru len do(
+			for j: i+1 thru len do(
+				if i#j then
+				front[i,j]: read("soma das resistencias na fronteira entre a malha", i, "e", j, ":")
+			)
+		),
+		R_mat: generateRMat_v2(sr, front, len),
+		I_list: makelist(read("i no campo ", x, ":"), x, 1, len),
+		V_list: makelist(read("v no campo ", x, ":"), x, 1, len),
+		print("R",R_mat,"I",I_list,"V",V_list),
+		eq: map("=", list_matrix_entries(R_mat.I_list), V_list),
+		sol: float(solve(eq))
+	)
+)$
+
+generateRMat_v2(sr, front, len) := (
+block(
+		final_mat: matrix(),
+		mat_list: makelist(),
+		for i: 1 thru len do(
+			for j: 1 thru len do(
+				if i = j
+				then mat_list: append(mat_list, makelist(sr[i]))
+				/* para lidar com o facto de não pedir input repetido */
+				else mat_list: append(mat_list, makelist(-front[min(i,j), max(i,j)]))
+			),
+			final_mat: addrow(final_mat, mat_list),
+			mat_list: makelist()
+		),
+		final_mat
+	)
+)$
+
+percentagem_pilha_pos_horas():=(c:read("corrente media"),horas:read("horas"),cinicial:read("carga inicial"),fim:(cinicial - ((c/1000) * horas))/cinicial,
+print("%=", float(fim))
+)$
+
+energia_total_horas():=(volt:read("voltagem"),
+          cmedia:read("corrente media"),
+         etotal:read("energia total em kw.h"),
+                  float(fim = (etotal * 1000) /(volt * cmedia)));
+
+energia_eletrostatica():=(cond:read("Pico do condensador(em pF)"),pilha:read("voltagem da pilha(em v)"),energiaeletrostatica=0.5*pilha*pilha*(cond*10^-12));
+
+coulomb():=(carga1:read("carga1 em C"),carga2:read("carga2 em C"),distancia:read("distancia em metros"),float(coulomb:(((carga1 * carga2)* (9*10^9))/(distancia * distancia))),print (coulomb, "N"));
+
+custo_total_energia():=(potencia:read("potencia em kw"),tempo:read("tempo em horas"),custodaenergia:read("custo da energia eletrica em euros"),float(preco= (potencia * tempo * custodaenergia)));
+
+diferenca_potencial_cargas():=(fonte:read("fonte em volts"),c1:read("carga 1"),c2:read("carga 2"), u = ((((c1*c2)/(c1+c2)) * fonte)/c1));
+
+rigidez():=(rigidez:read("rigidez dieletrica em kV/mm"),q:read("carga total em Coulomb"),k:9e9,e:rigidez*10^6,r=sqrt((q*k)/e));
+
+modulo_duas_cargas():=(carga1:read("carga 1 em C"),carga2:read("carga 2 em C"),distancia1:read("distancia carga 1"),distancia2:read("distancia carga 2"),float(modulo= ((9*10^9 * carga1)/ (distancia1 * distancia1)) + ((9*10^9 * carga2)/ (distancia2 * distancia2))));
+
+condensador_placas_paralelas_carga_armazenada():=(area:read("area das placas em m"),
+distancia:read("distancia entre placas em m"),
+volt:read("voltagem"),
+float(carga= (area/(4*3.14*9*10^9*distancia)*volt)));
+
+resistencia():=(area:read("area"),constant:read("constante dieletrica"),capacidade:read("capacidade(F)"),voltagem:read("voltagem maxima(V)"),((voltagem)/(((area*constant)/capacidade)/(3.14*4*9*10^9))));
+
+dentro_do_paralelepipedo_definido():=(x:read("valor de x"),y:read("valor de y"),z:read("valor de z"),fluxo:read("valor do fluxo (N/Cm^2)"),fluxo/(4*3.14*9*10^9)/(x*y*z));
+
+num_condutor_ligado_a_uma_pilha() := (
+numel: read ("numero de electroes:"),
+t: read ("tempo:"),
+V: read ("fem"),
+Q: (numel*1.602*10^-19),
+I: Q/t,
+print("carga: ", Q, "---- corrente: ", I, "---- energia fornecida ", Q*V," ------ potencia media durante(em W) ",t," segundos ", Q*V/t)
+
+);
+
+dois_condensadores_capacidade_em_serie():= block(
+	c1: read("valor do condensador 1 (µF) ?  "),
+	c2: read("valor do condensador 2 (µF) ?  "),
+	fem: read("fem da fonte (V) ?  "),
+
+	Q: fem*(c1*c2/(c1+c2)),
+
+	deltaV1: Q/c1,
+	deltaV2: Q/c2,
+
+	print(" Diferenca de potencial em 1 --> ", float(deltaV1), " V "),
+	print(" Diferenca de potencial em 2 --> ", float(deltaV2), " V "),
+	print(" Carga no condensador 1 --> ", float(deltaV1*c1), " V "),
+	print(" Carga no condensador 2 --> ", float(deltaV2*c2), " V ")
+);
+
+valor_resistencia_equivalente():=(
+    print(" _________________________________R3________B"),
+    print("|                     |                     |"),
+    print("|                     |                     |"),
+    print("R1                    R2                   R4"),
+    print("|                     |                     |"),
+    print("A_____________________|_____________________|"),
+    print("VALOR DA RESISTENCIA EQUIVALENTE AO PONTO A ATÉ B"),
+    r1: read ("Resistencia 1:"),
+    r2: read ("Resistencia 2:"),
+    r3: read ("Resistencia 3:"),
+    r4: read ("Resistencia 4:"),
+    r5: (r1*r2)/(r1+r2),
+    r6: r5+r3,
+    r7=float((r6*r4)/(r6+r4)));
+motor_eletrico_alimentado_fonte_eletromotriz():=(
+print(" Admitindo que a energia elétrica é transformada a
+100% em energia mecânica, a corrente necessária será:"),
+fem: read("Forca Eletromotriz(V)"),
+trab: read("Trabalho(kJ)(kJ é e3)"),
+t: read("Tempo(s)"),
+P:trab/t,
+I("A")=float(P/fem));
+
+ddp_indutor_resistencia_expressao_corrente():=(
+print(" Admitindo que a energia elétrica é transformada a
+100% em energia mecânica, a corrente necessária será:"),
+i: read("Indutor(H)"),
+r: read("Resistencia(Ω)"),
+fem: read("Forca eletromotriz(V)"),
+tem: read("Tempo(s)"),
+ep: read("Expressao da corrente no circuito"),
+[z1,z2]:[i*s,r],
+Is:ratsimp(laplace(ep,t,s)),
+Zs:z1+z2,
+Vsz1:z1*Is,
+Vtz1:ilt(Vsz1,s,t),
+resposta=subst(t=tem,Vtz1));
+
+duas_resistencias_potencia_maxima_sem_queimar():=(
+r1: read("Resistencia 1(Ω)"),
+r2: read("Resistencia 2(Ω)"),
+p: read("Potencia Maxima sem se queimar(W)"),
+I1: sqrt(p/r1),
+I2: sqrt(p/r2),
+V1:r1*I1,
+V2:r2*I2,
+R:(r1*r2)/(r1+r2),
+if(V1<V2) then P=(V1*V1)/R
+else P=(V2*V2)/R);
+
+sistema_tres_cargas_pontuais_relacao():=(
+    q1: read ("Carga 1 (nC):"),
+    q2: read ("Carga 2 (nC):"),
+    q3: read ("Carga 3 (nC):"),
+    d12: read ("Distância entre carga 1 e 2 (cm):"),
+    d13: read ("Distância entre carga 1 e 3 (cm):"),
+    d23: read ("Distância entre carga 2 e 3 (cm):"),
+	
+	k: 9e9,
+	
+	F13: (k*abs(q1)*abs(q3))/(d13^2),	
+	F23: (k*abs(q2)*abs(q3))/(d23^2),
+	
+	res: F13/F23,
+	
+	print(" Se as respostas tiverem em frações, experimentar float(opção) para ver o seu valor "),
+	print(" numérico e comparar com a solução obtida "),
+	print(" Relação entre as forças elétricas produzidas pelas cargas 1 e 2 sobre a carga 3.  -> ", res)
+);
+
+carga_armazenada_condensador():=(
+	print(" ___________________________________________"),
+    print("|                     |                     |"),
+    print("|                     |                    C2"),
+    print("V                     C1                    |"),
+    print("|                     |                    C3"),
+    print(" _____________________|_____________________|"),
+    v: read ("Pilha (V):"),
+    c1: read ("Condensador 1 (nF):"),
+    c2: read ("Condensador 2 (nF):"),
+    c3: read ("Condensador 3 (nF):"),
+	
+	c23: (c2*c3)/(c2+c3),
+	
+	res:c23*v,
+	
+	print(" Carga armazenada  -> ", res, " nC ")
+);
+
+comprimento_fio_temperatura_resistividade():=(
+    R: read ("Resistência (Ω):"),
+    p: read ("Resistividade (nΩ*m):"),
+    diam: read ("Diâmetro (mm):"),
+	
+	A: ((diam*10^(-3))/2)^2*%pi,
+	
+	float(solve(R = p*(L/A),L))
+);
+
+fluxo_eletrico_quadrado():=(
+    A: read ("Área do quadrado (m^2):"),
+    E: read ("Módulo do campo elétrico (N/C):"),
+	
+	alfa: (90-60)*%pi/180,
+	
+	fluxo: float(A*E*cos(alfa))
+);
+
+sabendo_corrente_indicada_malhas_determinar_r():=(
+r1: read("Soma das resistencias malha 1: "),
+v1: read("voltagem total malha 1: "),
+r2: read("Soma das resistencias malha 2: "),
+v2: read("voltagem total malha 2: "),
+rc: read("Soma das resistencias em comum malha 1 e 2: "),
+i: read("Intensidade (A): "),
+RR:matrix([r1,-rc],[-rc,r2]),
+E:matrix([-v1],[v2]),
+II:matrix([I1],[i]),
+II:invert(RR).E,
+float(solve(i=(invert(RR).E)[2][1],R))
+);
+
+intensidade_2_correntes_ponto_B():=(
+    print("A_________R1______________________R3________ "),
+    print("|         I1->        |         <-I2        |"),
+    print("|                     R2                    |"),
+    print("T1                    |                     T2"),
+    print("|                     T3                    |"),
+    print("|_________R2__________|___________R4________B"),
+    i1: read ("Intensidade 1(A):"),
+    i2: read ("Intensidade 2(A):"),
+    r1: read ("Resistencia 1(R1)(Ω):"),
+    r2: read ("Resistencia 2(R2)(Ω):"),
+    r4: read ("Resistencia 4(R4)(Ω):"),
+    t3: read ("Tensao 3(T3)(V):"),
+    i3:i1+i2,
+    potencialP=-i1*r1-i3*r2+t3-i2*r4);
+
+equacao_correta_malha():=(
+r1: read("Soma resistencias malha 1: "),
+v1: read("Voltagem apenas malha 1: "),
+r2: read("Soma resistencias malha 2: "),
+v2: read("Voltagem apenas malha 2: "),
+rc: read("Soma resistencias comum malha 1 e 2: "),
+vc: read("Voltagem em comum malha 1 e 2: "),
+R: matrix([r1,-rc],[-rc,r2]),
+E: matrix([v1+vc],[v2-vc]),
+[I1,I2]:[(invert(R).E)[1][1],(invert(R).E)[2][1]],
+r = float(5*I1+6*I2)
+);
+
+valor_carga_condensador():=(
+    print(" _________R1______________________R2________"),
+    print("|                     |                     |"),
+    print("|                     |                     |"),
+    print("V                     R3                   C1"),
+    print("|                     |                     |"),
+    print(" _________C2__________V_____________________|"),
+    I1: read ("Corrente 1 (A):"),
+    I2: read ("Corrente 2 (A):"),
+	I3: I2-I1,
+    R2: read ("Resistência 2 (Ω):"),
+    R3: read ("Resistência 3 (Ω):"),
+	C1: read ("Condensador 1 (F):"),
+	
+	abs(float(solve(3=q/C1+R2*I3+R3*I2, q)))
+);
+
+diferenca_potencial_resistencia_interruptor_fechado():=(
+print("Considerar apenas o lado do interruptor"),
+v: read("Voltagem da fonte (V): "),
+r1: read("Resistencia 1: "),
+r2: read("Resistencia 2: "),
+rt: r1+r2,
+I: v/rt,
+print("Dif potencial na Resistencia ", r1, ": ", r1*I),
+print("Dif potencial na Resistencia ", r2, ": ", v-(r1*I))
+);

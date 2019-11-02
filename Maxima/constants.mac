@@ -6,7 +6,7 @@ fpprintprec: 4$
 _g_: 9.8$
 _k_: 9.0e9$
 _e_: 1.602e-19$
-_electron_mass_: 9.109e-31$
+_electron_mass_: 9.109e-28$
 
 /* SI Prefixes */
 Y(value) := (
@@ -49,3 +49,17 @@ z(value) := (
 	_v: 10^(-21)* value )$
 y(value) := (
 	_v: 10^(-24)* value )$
+
+definition(string) := (
+	if string = "tribo_series" or string = "tribo_series()"
+	then print("tribo_series(): Prints the triboelectric series"),
+	if string = "coulomb(F, q1, q2, d)" or string = "coulomb()" or string = "coulomb"
+	then print("coulomb(F, q1, q2, d): Do the coulomb's law with its arguments"),
+	_f: ""
+)$
+
+definitions() := (
+	for i: 1 thru length(functions) do
+		definition(string(functions[i])),
+	_f: ""
+)$
