@@ -1,0 +1,28 @@
+load("constants.mac")$
+load("basic.mac")$
+
+fieldPlan_area_charge(__A, __Q) := (
+	__σ: __Q / __A,
+	__E: 2 * %pi * %k * __σ,
+	__ret: __E
+)$
+
+chargeSphere_field_centerDistance(__E, __r) := (
+	__Q: __E * __r^2 / %k,
+	__ret: __Q
+)$
+
+/*
+Esfera:
+fluxo: 4 * %pi * r^2 * E(r)
+fluxo: 4 * %pi * _k_ * qint
+qint: Q / R^3 * r^3
+E(r): _k_ * qint / r^2
+|E(r)|: _k_ * Q / R^3 * r
+
+Plano:
+fluxo: 2 * A * E
+fluxo: 4 * %pi * _k_ * Q
+sigma: Q/A
+E: 2 * %pi * _k_ * sigma
+*/
