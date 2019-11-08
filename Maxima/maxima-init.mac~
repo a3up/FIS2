@@ -1,7 +1,0 @@
-load("../FIS2/Maxima/constants.mac")$
-load("../FIS2/Maxima/basic.mac")$
-load("../FIS2/Maxima/mechanic.mac")$
-load("../FIS2/Maxima/electric.mac")$
-load("../FIS2/Maxima/old.mac")$
-load("../FIS2/Maxima/new.mac")$
-load("../FIS2/Maxima/flux.mac")$
